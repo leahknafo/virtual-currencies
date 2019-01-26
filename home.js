@@ -29,7 +29,9 @@ const collapseTemplate = `<img src="{{image}}">
   <li class="list-group-item">{{ILS}}&nbsp€</li>
   </ul>`;
 
-  const modalTemplate =`
+
+//Template for the modal
+const modalTemplate = `
   <div class="container mt-3">
   <!-- The Modal -->
   <div class="modal fade" id="myModal">
@@ -81,78 +83,89 @@ const collapseTemplate = `<img src="{{image}}">
   `
 
 
-//With page loading, information about the coins coming from API will be pasted to the display.
+//With page loading, information about the coins coming from API will be displayed.
 $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
-    console.log(d);
-    for (i = 100; i < 200; i++) {
-        let t = currenciesTemplate;
-        t = t.replace('{{symbol}}', d[i].symbol);
-        t = t.replace('{{name}}', d[i].name);
-        t = t.replace(/{{id}}/g, d[i].id);
-        $('#content').append(t);
+  console.log(d);
+  for (i = 100; i < 200; i++) {
+    let t = currenciesTemplate;
+    t = t.replace('{{symbol}}', d[i].symbol);
+    t = t.replace('{{name}}', d[i].name);
+    t = t.replace(/{{id}}/g, d[i].id);
+    $('#content').append(t);
 
-    }
-    collapseEvent();
+  }
+  collapseEvent();
 });
 
 
 //By clicking the button, additional information about the currency will be opened
 function collapseEvent() {
-    $('.collapse').on('show.bs.collapse', function () {
+  $('.collapse').on('show.bs.collapse', function () {
 
-        $.ajax('https://api.coingecko.com/api/v3/coins/' + this.id).done((d) => {
-            console.log(d);
-            let t = collapseTemplate;
-            t = t.replace('{{image}}', d.image.thumb);
-            t = t.replace('{{USD}}', d.market_data.current_price.usd);
-            t = t.replace('{{EUR}}', d.market_data.current_price.eur);
-            t = t.replace('{{ILS}}', d.market_data.current_price.ils);
-            $('#' + this.id).html(t);
+    $.ajax('https://api.coingecko.com/api/v3/coins/' + this.id).done((d) => {
+      console.log(d);
+      let t = collapseTemplate;
+      t = t.replace('{{image}}', d.image.thumb);
+      t = t.replace('{{USD}}', d.market_data.current_price.usd);
+      t = t.replace('{{EUR}}', d.market_data.current_price.eur);
+      t = t.replace('{{ILS}}', d.market_data.current_price.ils);
+      $('#' + this.id).html(t);
 
-        });
-    })
+    });
+  })
 }
 
 //This array contains all the "id" of the currencies
 var idArray = [];
 $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
-    for (i = 100; i < 200; i++) {
-        idArray.push(d[i].id);
-    }
+  for (i = 100; i < 200; i++) {
+    idArray.push(d[i].id);
+  }
 });
 
 
-//By pressing the "switch toggle button"
-var reportedCurrenciesArray=[];
+//If the user wants to add a sixth currency to the list of reports, the function that deals with the model will be called
+var reportedCurrenciesArray;
+var counter;
+var tempArray;
+
 function toggleChanges() {
-    var counter = 0;
-    for (let i = 0; i < idArray.length; i++) {
-        if ($("#my" + idArray[i]).prop("checked") == true) {
-            counter++
-            reportedCurrenciesArray.push(idArray[i]);
-            if (counter > 4) {
-                appendModalTemplate();
-                console.log(reportedCurrenciesArray);
-            }
-        }
+  counter = 0;
+  reportedCurrenciesArray = [];
+  for (let i = 0; i < idArray.length; i++) {
+    if ($("#my" + idArray[i]).prop("checked") == true) {
+      counter++
+      reportedCurrenciesArray.push(idArray[i]);
+      }
     }
+  if (counter > 5) {
+  console.log(reportedCurrenciesArray);
+  // $('#myairbloc-protocol').attr('disabled', true);
+  appendModalTemplate();
+  
+  }
+  if(counter==5){
+    tempArray=reportedCurrenciesArray;
+  }
+ 
+ 
 }
+// $('#myairbloc-protocol').removeAttr('disabled');
 
-function appendModalTemplate(){
-    let t = modalTemplate;
-    let r = reportedCurrenciesArray;
-    console.log(r[r.length-5])
-    t = t.replace(/{{first}}/g, r[r.length-5]);
-    t = t.replace(/{{second}}/g, r[r.length-4]);
-    t = t.replace(/{{third}}/g, r[r.length-3]);
-    t = t.replace(/{{forth}}/g, r[r.length-2]);
-    t = t.replace(/{{fifth}}/g, r[r.length-1]);
-    $('#modal').append(t);
-    $("#myModal").modal(); 
-    
-    
-    
 
+
+
+//The values ​​in the model change accordingly and the modal is displayed
+function appendModalTemplate() {
+  let t = modalTemplate;
+  let r = tempArray;
+  t = t.replace(/{{first}}/g, r[0]);
+  t = t.replace(/{{second}}/g, r[1]);
+  t = t.replace(/{{third}}/g, r[2]);
+  t = t.replace(/{{forth}}/g, r[3]);
+  t = t.replace(/{{fifth}}/g, r[4]);
+  $('#modal').html(t);
+  $("#myModal").modal();
 
 }
 
