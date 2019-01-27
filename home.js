@@ -114,137 +114,150 @@ function collapseEvent() {
   })
 }
 
-function byName(){
-  var search = $("#searchinput").val();
-  
-$.ajax('https://api.coingecko.com/api/v3/coins/' + search).done(function (d) {
-console.log(d);
-for(i=0; i<d.length; i++ ){
-    let t = countryTemplate;
-    t = t.replace('{{flag}}', d[i].flag);
-    t = t.replace('{{name}}', d[i].name);
-    t = t.replace('{{topleveldomain}}', d[i].topLevelDomain);
-    t = t.replace('{{capital}}', d[i].capital);
-    t = t.replace('{{currenciescode}}', d[i].currencies[0].code);
-    t = t.replace('{{currenciesname}}', d[i].currencies[0].name);
-    t = t.replace('{{currenciessymbol}}', d[i].currencies[0].symbol);
-    $('#content').append(t); 
-}
-});
-}
+
+
+
 $("#searchbutton").click(function () {
   $('#content').empty();
-  byName();
+  searchBySymbol()
+})
+
+var search;
+function searchBySymbol() {
+  $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
+    for (let i = 100; i < 200; i++) {
+      if (d[i].symbol == $("#searchinput").val()) {
+        search = d[i].id;
+      }
+    }
+    buildBySearch();
+   
+  })
+}
+
+function buildBySearch() {
+  $.ajax('https://api.coingecko.com/api/v3/coins/' + search).done(function (d) {
+    console.log(d);
+    let t = currenciesTemplate;
+    t = t.replace('{{symbol}}', d.symbol);
+    t = t.replace('{{name}}', d.name);
+    t = t.replace(/{{id}}/g, d.id);
+    $('#content').html(t);
+
+  
 });
+
+  }
+
 
 //This array contains all the "id" of the currencies
 var idArray = [];
-$.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
-  for (i = 100; i < 200; i++) {
-    idArray.push(d[i].id);
-  }
-});
-
-
-//If the user wants to add a sixth currency to the list of reports, the function that deals with the modal will be called
-var currenciesReport;
-var tempArray;
-var theSixth
-function toggleChanges() {
-  let counter = 0;
-  let valid=false;
-  tempArray = [];
-
-  for (let i = 0; i < idArray.length; i++) {
-    if ($("#my" + idArray[i]).prop("checked") == true) {
-      counter++
-      tempArray.push(idArray[i]);
+  $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
+    for (i = 100; i < 200; i++) {
+      idArray.push(d[i].id);
     }
-  }
-  if (counter == 5) {
-    valid=true;
-    currenciesReport = tempArray;
-  }
-  if (counter > 5) {
-    // if(valid==false){//An extreme case in which a user attempts to add a sixth currency without having passed the fifth addition step
-    //   currenciesReport = tempArray; 
-    // }
-    findTheSixth();
-    appendModalTemplate();
-  }
- 
-  console.log(currenciesReport);
-}
+  });
 
 
-//After comparing the array with five coins marked and the array with 6 coins marked. We find the last currency that has been marked. 
-function findTheSixth() {
-  for (let i = 0; i < tempArray.length; i++) {
-    let temp = false;
-    for (let j = 0; j < currenciesReport.length; j++) {
-      if (currenciesReport[j] == tempArray[i]) {
-        temp = true;
+  //If the user wants to add a sixth currency to the list of reports, the function that deals with the modal will be called
+  var currenciesReport;
+  var tempArray;
+  var theSixth
+  function toggleChanges() {
+    let counter = 0;
+    let valid = false;
+    tempArray = [];
+
+    for (let i = 0; i < idArray.length; i++) {
+      if ($("#my" + idArray[i]).prop("checked") == true) {
+        counter++
+        tempArray.push(idArray[i]);
       }
     }
-    if (temp == false) {
-      theSixth = tempArray[i];
+    if (counter == 5) {
+      valid = true;
+      currenciesReport = tempArray;
+    }
+    if (counter > 5) {
+      // if(valid==false){//An extreme case in which a user attempts to add a sixth currency without having passed the fifth addition step
+      //   currenciesReport = tempArray; 
+      // }
+      findTheSixth();
+      appendModalTemplate();
+    }
+
+    console.log(currenciesReport);
+  }
+
+
+  //After comparing the array with five coins marked and the array with 6 coins marked. We find the last currency that has been marked. 
+  function findTheSixth() {
+    for (let i = 0; i < tempArray.length; i++) {
+      let temp = false;
+      for (let j = 0; j < currenciesReport.length; j++) {
+        if (currenciesReport[j] == tempArray[i]) {
+          temp = true;
+        }
+      }
+      if (temp == false) {
+        theSixth = tempArray[i];
+      }
     }
   }
-}
 
 
 
-//The values ​​in the modal change accordingly and the modal is displayed
-function appendModalTemplate() {
-  let t = modalTemplate;
-  let r = currenciesReport;
-  t = t.replace(/{{first}}/g, r[0]);
-  t = t.replace(/{{second}}/g, r[1]);
-  t = t.replace(/{{third}}/g, r[2]);
-  t = t.replace(/{{forth}}/g, r[3]);
-  t = t.replace(/{{fifth}}/g, r[4]);
-  $('#modal').html(t);
-  $("#myModal").modal();
-  cancelSwitching()
-}
-
-//The function checks whether a currency has been removed from the list. And if this is the case, the sixth coin marked on the spot will be inserted
-function modalToggleChange() {
-  for (let i = 0; i < currenciesReport.length; i++) {
-    if ($("#modal" + currenciesReport[i]).prop("checked") == false) {
-      $("#savebutton").click(function () {
-        $("#my" + currenciesReport[i]).prop("checked", false);
-        $("#my" + theSixth).prop("checked", true);
-      })
-    }
+  //The values ​​in the modal change accordingly and the modal is displayed
+  function appendModalTemplate() {
+    let t = modalTemplate;
+    let r = currenciesReport;
+    t = t.replace(/{{first}}/g, r[0]);
+    t = t.replace(/{{second}}/g, r[1]);
+    t = t.replace(/{{third}}/g, r[2]);
+    t = t.replace(/{{forth}}/g, r[3]);
+    t = t.replace(/{{fifth}}/g, r[4]);
+    $('#modal').html(t);
+    $("#myModal").modal();
+    cancelSwitching()
   }
-}
 
-
-
-//By pressing the Cancel button or the Save button without changing. The sixth currency will not be placed in the list of reports
-function cancelSwitching() {
-  $(".close").click(function () {
-    let flag = true;
+  //The function checks whether a currency has been removed from the list. And if this is the case, the sixth coin marked on the spot will be inserted
+  function modalToggleChange() {
     for (let i = 0; i < currenciesReport.length; i++) {
-      if ($("#my" + currenciesReport[i]).prop("checked") == false) {
-        flag = false;
+      if ($("#modal" + currenciesReport[i]).prop("checked") == false) {
+        $("#savebutton").click(function () {
+          $("#my" + currenciesReport[i]).prop("checked", false);
+          $("#my" + theSixth).prop("checked", true);
+        })
       }
     }
-    if (flag == true) {
-      $("#my" + theSixth).prop("checked", false);
-    }
-  })
-  $("#savebutton").click(function () {
-    let flag = true;
-    for (let i = 0; i < currenciesReport.length; i++) {
-      if ($("#my" + currenciesReport[i]).prop("checked") == false) {
-        flag = false;
-      }
-    }
-    if (flag == true) {
-      $("#my" + theSixth).prop("checked", false);
-    }
-  })
+  }
 
-}
+
+
+  //By pressing the Cancel button or the Save button without changing. The sixth currency will not be placed in the list of reports
+  function cancelSwitching() {
+    $(".close").click(function () {
+      let flag = true;
+      for (let i = 0; i < currenciesReport.length; i++) {
+        if ($("#my" + currenciesReport[i]).prop("checked") == false) {
+          flag = false;
+        }
+      }
+      if (flag == true) {
+        $("#my" + theSixth).prop("checked", false);
+      }
+    })
+    $("#savebutton").click(function () {
+      let flag = true;
+      for (let i = 0; i < currenciesReport.length; i++) {
+        if ($("#my" + currenciesReport[i]).prop("checked") == false) {
+          flag = false;
+        }
+      }
+      if (flag == true) {
+        $("#my" + theSixth).prop("checked", false);
+      }
+    })
+
+  }
