@@ -1,3 +1,4 @@
+
 //The main template of the coins
 const currenciesTemplate = `<div class="card col-4" style="width: 18rem;">
     <div class="card-body">
@@ -114,6 +115,43 @@ function collapseEvent() {
   })
 }
 
+
+
+
+$("#searchbutton").click(function () {
+  $('#content').empty();
+  searchBySymbol()
+})
+
+var search;
+function searchBySymbol() {
+  $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
+    for (let i = 100; i < 200; i++) {
+      if (d[i].symbol == $("#searchinput").val()) {
+        search = d[i].id;
+      }
+    }
+    buildBySearch();
+
+  })
+}
+
+function buildBySearch() {
+  $.ajax('https://api.coingecko.com/api/v3/coins/' + search).done(function (d) {
+    console.log(d);
+    let t = currenciesTemplate;
+    t = t.replace('{{symbol}}', d.symbol);
+    t = t.replace('{{name}}', d.name);
+    t = t.replace(/{{id}}/g, d.id);
+    $('#content').html(t);
+
+
+  });
+  collapseEvent();
+
+}
+
+
 //This array contains all the "id" of the currencies
 var idArray = [];
 $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
@@ -124,38 +162,53 @@ $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
 
 
 //If the user wants to add a sixth currency to the list of reports, the function that deals with the modal will be called
-var currenciesReport;
-var tempArray;
-var theSixth
+var currenciesReport=[];
+var tempArray=[];
+var theSixth;
+var reports=[];
+
 function toggleChanges() {
   let counter = 0;
-  tempArray = [];
+  let valid = false;
+  tempArray.length = 0;
+  reports.length = 0;
+
   for (let i = 0; i < idArray.length; i++) {
     if ($("#my" + idArray[i]).prop("checked") == true) {
       counter++
       tempArray.push(idArray[i]);
+      if(counter <= 5){
+        reports.push(idArray[i]);
+      }
     }
+  }
+ 
+  if (counter == 5) {
+    valid = true;
+    currenciesReport = tempArray;
   }
   if (counter > 5) {
     findTheSixth();
     appendModalTemplate();
   }
-  if (counter == 5) {
-    currenciesReport = tempArray;
-  }
 }
+
+
+
+
+
 
 
 //After comparing the array with five coins marked and the array with 6 coins marked. We find the last currency that has been marked. 
 function findTheSixth() {
   for (let i = 0; i < tempArray.length; i++) {
-    let temp = false;
+    let check = false;
     for (let j = 0; j < currenciesReport.length; j++) {
       if (currenciesReport[j] == tempArray[i]) {
-        temp = true;
+        check = true;
       }
     }
-    if (temp == false) {
+    if (check == false) {
       theSixth = tempArray[i];
     }
   }
@@ -180,28 +233,25 @@ function appendModalTemplate() {
 //The function checks whether a currency has been removed from the list. And if this is the case, the sixth coin marked on the spot will be inserted
 function modalToggleChange() {
   for (let i = 0; i < currenciesReport.length; i++) {
-    if ($("#modal" + currenciesReport[i]).prop("checked") == false) {
+    if ($("#modal" + currenciesReport[i]).prop("checked") == false) { var removeItem = currenciesReport[i];
       $("#savebutton").click(function () {
         $("#my" + currenciesReport[i]).prop("checked", false);
         $("#my" + theSixth).prop("checked", true);
+        currenciesReport = jQuery.grep(currenciesReport, function (value) {
+          return value != removeItem;
+        });
+        currenciesReport.push(theSixth);
       })
     }
   }
-    // else{
-    //   temporary.push(currenciesReport[i]);
-
-    // }
-}
-// if($("#my" + theSixth).prop("checked")==true){
-//   temporary.push(theSixth);
-// }
-// currenciesReport=tempArray;
+  reports=currenciesReport;
 }
 
 
 
+
+//By pressing the Cancel button or the Save button without changing. The sixth currency will not be placed in the list of reports
 function cancelSwitching() {
-  console.log(currenciesReport);
   $(".close").click(function () {
     let flag = true;
     for (let i = 0; i < currenciesReport.length; i++) {
@@ -226,3 +276,10 @@ function cancelSwitching() {
   })
 
 }
+
+$.ajax('https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH&tsyms=USD').done(function (d) {
+  console.log(d);
+});
+$("#k").click(function () {
+  console.log(reports)
+})
