@@ -168,7 +168,6 @@ var theSixth;
 
 function toggleChanges() {
   let counter = 0;
-  let valid = false;
   tempArray=[]
   for (let i = 0; i < idArray.length; i++) {
     if ($("#my" + idArray[i]).prop("checked") == true) {
@@ -176,9 +175,9 @@ function toggleChanges() {
       tempArray.push(idArray[i]);
       }
     }
-  if (counter == 5) {
-    valid = true;
+  if (counter <= 5) {
     currenciesReport = tempArray;
+    setReportsToLocalStorage(currenciesReport);
   }
   if (counter > 5) {
     findTheSixth();
@@ -228,6 +227,7 @@ function modalToggleChange() {
           return value != removeItem;
         });
         currenciesReport.push(theSixth);
+        setReportsToLocalStorage(currenciesReport);
       })
     }
   }
@@ -266,6 +266,21 @@ function cancelSwitching() {
 $.ajax('https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH&tsyms=USD').done(function (d) {
   console.log(d);
 });
-$("#k").click(function () {
-  console.log(currenciesReport)
-})
+var reports = [];
+
+function setReportsToLocalStorage(currenciesReport) {
+  report = JSON.stringify(currenciesReport);
+  localStorage.setItem("report", report);
+}
+
+function getReportsFromLocalStorage() {
+  let getMe = localStorage.getItem("report");
+return JSON.parse(getMe);
+} 
+
+// $("#k").click(function () {
+//   if ((localStorage.getItem("report") != null)) {
+//     var reports = getReportsFromLocalStorage(); 
+//     console.log(reports)
+// }
+// })
