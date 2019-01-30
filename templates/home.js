@@ -263,6 +263,9 @@ function cancelSwitching() {
 
 }
 
+$.ajax('https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH&tsyms=USD').done(function (d) {
+  console.log(d);
+});
 var reports = [];
 
 function setReportsToLocalStorage(currenciesReport) {

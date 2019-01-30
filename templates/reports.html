@@ -1,35 +1,32 @@
 <!DOCTYPE HTML>
 <html>
+
 <head>
 	<script src="node_modules/jquery/dist/jquery.min.js"></script>
 	<script type="text/javascript" src="home.js"></script>
 	<script>
 		var reports = [];
-		var h = ['APX', 'ETH', 'BTC']
 
 		if ((localStorage.getItem("report") != null)) {
 			reports = getReportsFromLocalStorage();
 			console.log(reports)
 		}
-
-
 		window.onload = function () {
+
 
 			var dataPoints1 = [];
 			var dataPoints2 = [];
 			var dataPoints3 = [];
-			var dataPoints4 = [];
-			var dataPoints5 = [];
 
 			var options = {
 				title: {
-					text: "Virtual Currencies: real-time reports"
+					text: "Electricity Generation in Turbine"
 				},
 				axisX: {
 					title: "chart updates every 2 secs"
 				},
 				axisY: {
-					suffix: "$",
+					suffix: "Wh",
 					includeZero: false
 				},
 				toolTip: {
@@ -45,25 +42,25 @@
 				data: [{
 					type: "line",
 					xValueType: "dateTime",
-					yValueFormatString: "###.00$",
+					yValueFormatString: "###.00Wh",
 					xValueFormatString: "hh:mm:ss TT",
 					showInLegend: true,
-					name: h[0],
+					name: "Turbine 1",
 					dataPoints: dataPoints1
 				},
 				{
 					type: "line",
 					xValueType: "dateTime",
-					yValueFormatString: "###.00$",
+					yValueFormatString: "###.00Wh",
 					showInLegend: true,
-					name: h[1],
+					name: "Turbine 2",
 					dataPoints: dataPoints2
 				}, {
 					type: "line",
 					xValueType: "dateTime",
-					yValueFormatString: "###.00$",
+					yValueFormatString: "###.00Wh",
 					showInLegend: true,
-					name: h[2],
+					name: "Turbine 2",
 					dataPoints: dataPoints3
 				}]
 			};
@@ -81,32 +78,14 @@
 			}
 
 			var updateInterval = 2000;
-			var yValue1;
-			var yValue2;
-			var yValue3;
-			var data = [];
-			function bringData() {
-				$.ajax('https://min-api.cryptocompare.com/data/pricemulti?fsyms=' + h[0] + ',' + h[1] + ',' + h[2] + ',' + h[3] + ',' + h[4] + '&tsyms=USD').done(function (d) {
-					for (key in d) {
-						if (d.hasOwnProperty(key)) {
-							var value = d[key];
-							//do something with value;
-							data.push(value["USD"])
-						}
-
-					}
-					console.log(data)
-					yValue1 = data[0];
-					yValue2 = data[1];
-					yValue3 = data[2];
-				});
-			}
 			// initial value
-			bringData();
+			var yValue1 = 800;
+			var yValue2 = 810;
+			var yValue3 = 780;
 
 			var time = new Date;
 			// starting at 10.00 am
-			time.setHours(00);
+			time.setHours(10);
 			time.setMinutes(00);
 			time.setSeconds(00);
 			time.setMilliseconds(00);
@@ -116,13 +95,14 @@
 				var deltaY1, deltaY2, deltaY3;
 				for (var i = 0; i < count; i++) {
 					time.setTime(time.getTime() + updateInterval);
-
 					deltaY1 = -1 + Math.random() * (1 + 1);
 					deltaY2 = -1 + Math.random() * (1 + 1);
 					deltaY3 = -1 + Math.random() * (1 + 1);
 
 					// adding random value and rounding it to two digits. 
-					bringData();
+					yValue1 = Math.round((yValue1 + deltaY1) * 100) / 100;
+					yValue2 = Math.round((yValue2 + deltaY2) * 100) / 100;
+					yValue3 = Math.round((yValue3 + deltaY3) * 100) / 100;
 
 					// pushing the new values
 					dataPoints1.push({
@@ -140,9 +120,9 @@
 				}
 
 				// updating legend text with  updated with y Value 
-				options.data[0].legendText = h[0] + " : " + yValue1 + "$";
-				options.data[1].legendText = h[1] + " : " + yValue2 + "$";
-				options.data[2].legendText = h[2] + " : " + yValue3 + "$";
+				options.data[0].legendText = "Turbine 1 : " + yValue1 + "$";
+				options.data[1].legendText = "Turbine 2 : " + yValue2 + "$";
+				options.data[2].legendText = "Turbine 3 : " + yValue3 + "$";
 				$("#chartContainer").CanvasJSChart().render();
 			}
 			// generates first set of dataPoints 
