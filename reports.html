@@ -6,27 +6,53 @@
 	<script type="text/javascript" src="home.js"></script>
 	<script>
 		var reports = [];
+		var symbolsArray = [];
+		var h;
+		// var h = ['APX', 'ETH', 'BTC', 'AIREP', 'AST']
+		// var h= symbolsArray;
+		
 
-		if ((localStorage.getItem("report") != null)) {
-			reports = getReportsFromLocalStorage();
-			console.log(reports)
-		}
+		//Get the currency report from local storage:
+	
+
+			//Converts the currency report to upper case symbols instead of lower case names 
+			// $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
+			// 	for (let i = 100; i < 200; i++) {
+			// 		for (let j = 0; j <= reports.length; j++) {
+			// 			if (d[i].id == reports[j]) {
+			// 				let res = d[i].symbol.toUpperCase();
+			// 				symbolsArray.push(res)
+			// 			}
+			// 		}
+			// 	}
+			// 	console.log(symbolsArray)
+			// });
+	
+
+
 		window.onload = function () {
 
+			if ((localStorage.getItem("report") != null)) {
+			reports = getReportsFromLocalStorage();
+			console.log(reports)
+			 h = reports;
+			}
 
 			var dataPoints1 = [];
 			var dataPoints2 = [];
 			var dataPoints3 = [];
+			var dataPoints4 = [];
+			var dataPoints5 = [];
 
 			var options = {
 				title: {
-					text: "Electricity Generation in Turbine"
+					text: "Real Time Reports"
 				},
 				axisX: {
 					title: "chart updates every 2 secs"
 				},
 				axisY: {
-					suffix: "Wh",
+					suffix: "$",
 					includeZero: false
 				},
 				toolTip: {
@@ -42,26 +68,40 @@
 				data: [{
 					type: "line",
 					xValueType: "dateTime",
-					yValueFormatString: "###.00Wh",
+					yValueFormatString: "###.00$",
 					xValueFormatString: "hh:mm:ss TT",
 					showInLegend: true,
-					name: "Turbine 1",
+					name: h[0],
 					dataPoints: dataPoints1
 				},
 				{
 					type: "line",
 					xValueType: "dateTime",
-					yValueFormatString: "###.00Wh",
+					yValueFormatString: "###.00$",
 					showInLegend: true,
-					name: "Turbine 2",
+					name: h[1],
 					dataPoints: dataPoints2
 				}, {
 					type: "line",
 					xValueType: "dateTime",
-					yValueFormatString: "###.00Wh",
+					yValueFormatString: "###.00$",
 					showInLegend: true,
-					name: "Turbine 2",
+					name: h[2],
 					dataPoints: dataPoints3
+				}, {
+					type: "line",
+					xValueType: "dateTime",
+					yValueFormatString: "###.00$",
+					showInLegend: true,
+					name: h[3],
+					dataPoints: dataPoints4
+				}, {
+					type: "line",
+					xValueType: "dateTime",
+					yValueFormatString: "###.00$",
+					showInLegend: true,
+					name: h[4],
+					dataPoints: dataPoints5
 				}]
 			};
 
@@ -78,10 +118,56 @@
 			}
 
 			var updateInterval = 2000;
+			var yValue1;
+			var yValue2;
+			var yValue3;
+			var yValue4;
+			var yValue5;
+			var data = [];
+
+
+			// function bringData() {
+			// 	$.ajax('https://min-api.cryptocompare.com/data/pricemulti?fsyms=' + h[0] + ',' + h[1] + ',' + h[2] + ',' + h[3] + ',' + h[4] + '&tsyms=USD').done(function (d) {
+			// 		console.log(d)
+			// 		for (key in d) {
+			// 			if (d.hasOwnProperty(key)) {
+			// 				var value = d[key];
+			// 				data.push(value["USD"])
+			// 			}
+			// 		}
+			// 		yValue1 = data[0];
+			// 		yValue2 = data[1];
+			// 		yValue3 = data[2];
+			// 		yValue4 = data[3];
+			// 		yValue5 = data[4];
+			// 	});
+			// }
+
+			function bringData() {
+				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[0]).done(function (d) {
+					data.push(d.market_data.current_price.usd)
+				})
+				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[1]).done(function (d) {
+					data.push(d.market_data.current_price.usd)
+				})
+				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[2]).done(function (d) {
+					data.push(d.market_data.current_price.usd)
+				})
+				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[3]).done(function (d) {
+					data.push(d.market_data.current_price.usd)
+				})
+				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[4]).done(function (d) {
+					data.push(d.market_data.current_price.usd)
+				})
+				yValue1 = data[0];
+				yValue2 = data[1];
+				yValue3 = data[2];
+				yValue4 = data[3];
+				yValue5 = data[4];
+
+			}
 			// initial value
-			var yValue1 = 800;
-			var yValue2 = 810;
-			var yValue3 = 780;
+			bringData();
 
 			var time = new Date;
 			// starting at 10.00 am
@@ -92,17 +178,18 @@
 
 			function updateChart(count) {
 				count = count || 1;
-				var deltaY1, deltaY2, deltaY3;
+				var deltaY1, deltaY2, deltaY3, deltaY4, deltaY5;
 				for (var i = 0; i < count; i++) {
 					time.setTime(time.getTime() + updateInterval);
+
 					deltaY1 = -1 + Math.random() * (1 + 1);
 					deltaY2 = -1 + Math.random() * (1 + 1);
 					deltaY3 = -1 + Math.random() * (1 + 1);
+					deltaY4 = -1 + Math.random() * (1 + 1);
+					deltaY5 = -1 + Math.random() * (1 + 1);
 
-					// adding random value and rounding it to two digits. 
-					yValue1 = Math.round((yValue1 + deltaY1) * 100) / 100;
-					yValue2 = Math.round((yValue2 + deltaY2) * 100) / 100;
-					yValue3 = Math.round((yValue3 + deltaY3) * 100) / 100;
+
+					bringData();
 
 					// pushing the new values
 					dataPoints1.push({
@@ -117,12 +204,22 @@
 						x: time.getTime(),
 						y: yValue3
 					});
+					dataPoints4.push({
+						x: time.getTime(),
+						y: yValue4
+					});
+					dataPoints5.push({
+						x: time.getTime(),
+						y: yValue5
+					});
 				}
 
 				// updating legend text with  updated with y Value 
-				options.data[0].legendText = "Turbine 1 : " + yValue1 + "$";
-				options.data[1].legendText = "Turbine 2 : " + yValue2 + "$";
-				options.data[2].legendText = "Turbine 3 : " + yValue3 + "$";
+				options.data[0].legendText = h[0] + " : " + yValue1 + "$";
+				options.data[1].legendText = h[1] + " : " + yValue2 + "$";
+				options.data[2].legendText = h[2] + " : " + yValue3 + "$";
+				options.data[3].legendText = h[3] + " : " + yValue4 + "$";
+				options.data[4].legendText = h[4] + " : " + yValue5 + "$";
 				$("#chartContainer").CanvasJSChart().render();
 			}
 			// generates first set of dataPoints 
