@@ -3,6 +3,6 @@ $('#mainNav>li>a').click(function(e) {
     const href = $(this).attr('href');
     $.ajax(`templates/${href}.html`)
     .done(function(htmlData) {
-        $('#mainContent').html(htmlData);
+        $('#content').html(htmlData);
     })
 })

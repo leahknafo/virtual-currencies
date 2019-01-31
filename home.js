@@ -1,3 +1,4 @@
+
 //The main template of the coins
 const currenciesTemplate = `<div class="card col-4" style="width: 18rem;">
     <div class="card-body">

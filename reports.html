@@ -12,26 +12,10 @@
 		// var h= symbolsArray;
 		
 
-		//Get the currency report from local storage:
-	
-
-			//Converts the currency report to upper case symbols instead of lower case names 
-			// $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
-			// 	for (let i = 100; i < 200; i++) {
-			// 		for (let j = 0; j <= reports.length; j++) {
-			// 			if (d[i].id == reports[j]) {
-			// 				let res = d[i].symbol.toUpperCase();
-			// 				symbolsArray.push(res)
-			// 			}
-			// 		}
-			// 	}
-			// 	console.log(symbolsArray)
-			// });
-	
-
-
 		window.onload = function () {
 
+			
+		//Get the currency report from local storage:
 			if ((localStorage.getItem("report") != null)) {
 			reports = getReportsFromLocalStorage();
 			console.log(reports)
@@ -126,39 +110,14 @@
 			var data = [];
 
 
-			// function bringData() {
-			// 	$.ajax('https://min-api.cryptocompare.com/data/pricemulti?fsyms=' + h[0] + ',' + h[1] + ',' + h[2] + ',' + h[3] + ',' + h[4] + '&tsyms=USD').done(function (d) {
-			// 		console.log(d)
-			// 		for (key in d) {
-			// 			if (d.hasOwnProperty(key)) {
-			// 				var value = d[key];
-			// 				data.push(value["USD"])
-			// 			}
-			// 		}
-			// 		yValue1 = data[0];
-			// 		yValue2 = data[1];
-			// 		yValue3 = data[2];
-			// 		yValue4 = data[3];
-			// 		yValue5 = data[4];
-			// 	});
-			// }
 
 			function bringData() {
-				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[0]).done(function (d) {
+				for(let i=0; i<=4; i++){
+				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[i]).done(function (d) {
 					data.push(d.market_data.current_price.usd)
+				
 				})
-				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[1]).done(function (d) {
-					data.push(d.market_data.current_price.usd)
-				})
-				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[2]).done(function (d) {
-					data.push(d.market_data.current_price.usd)
-				})
-				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[3]).done(function (d) {
-					data.push(d.market_data.current_price.usd)
-				})
-				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[4]).done(function (d) {
-					data.push(d.market_data.current_price.usd)
-				})
+				}
 				yValue1 = data[0];
 				yValue2 = data[1];
 				yValue3 = data[2];
