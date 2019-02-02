@@ -1,26 +1,77 @@
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="project.css">
 	<script src="node_modules/jquery/dist/jquery.min.js"></script>
-	<script type="text/javascript" src="home.js"></script>
+	<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+	<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+	<header>
+		<div class="container">
+			<nav class="navbar navbar-expand-lg navbar navbar-dark bg-dark">
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01"
+				 aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+					<a class="navbar-brand" href="#">Virtual currencies</a>
+					<ul class="navbar-nav mr-auto mt-2 mt-lg-0" id='mainNav'>
+						<li class="nav-item">
+							<a id="home" class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+						</li>
+						<li class="nav-item active">
+							<a id="reports" class="nav-link" href="reports.html">Reports</a>
+						</li>
+						<li class="nav-item">
+							<a id="about" class="nav-link" href="about.html">About</a>
+						</li>
+					</ul>
+					<form class="form-inline my-2 my-lg-0">
+						<input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="searchinput">
+						<button class="btn btn-outline-success my-2 my-sm-0" type="button" id="searchbutton">Search</button>
+					</form>
+				</div>
+			</nav>
+		</div>
+		<br>
+		<div class="myProgress">
+				<div id="myBar">10%</div>
+			  </div>
+		<br><br>
+	</header>
+
+	<script src="node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="home.js"></script>
 	<script>
+	
 		var reports = [];
 		var symbolsArray = [];
 		var h;
-		// var h = ['APX', 'ETH', 'BTC', 'AIREP', 'AST']
-		// var h= symbolsArray;
-		
+
+//Get the currency report from local storage:
+if ((localStorage.getItem("report") != null)) {
+				reports = getReportsFromLocalStorage();
+				console.log(reports)
+				h = reports;
+			}
+			
+// function sleep(ms) {
+//   return new Promise(resolve => setTimeout(resolve, ms));
+// } 
+// async function demo() {
+//   await sleep(400);
+// }
 
 		window.onload = function () {
-
-			
-		//Get the currency report from local storage:
-			if ((localStorage.getItem("report") != null)) {
-			reports = getReportsFromLocalStorage();
-			console.log(reports)
-			 h = reports;
-			}
+			move()
 
 			var dataPoints1 = [];
 			var dataPoints2 = [];
@@ -107,28 +158,36 @@
 			var yValue3;
 			var yValue4;
 			var yValue5;
-			var data = [];
+			var data=[];
+
 
 
 
 			function bringData() {
-				for(let i=0; i<=4; i++){
-				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[i]).done(function (d) {
-					data.push(d.market_data.current_price.usd)
-				
-				})
+				for (let i = 0; i <= h.length; i++) {
+
+					$.ajax('https://api.coingecko.com/api/v3/coins/' + h[i]).done(function (d) {
+						data.push(d.market_data.current_price.usd)
+					})
+					// demo()
+					
 				}
 				yValue1 = data[0];
 				yValue2 = data[1];
 				yValue3 = data[2];
 				yValue4 = data[3];
 				yValue5 = data[4];
-
+				console.log(data)
+                data.length=0;
+				
 			}
-			// initial value
-			bringData();
+			//initial value
+		bringData()
+
+			
 
 			var time = new Date;
+			
 			// starting at 10.00 am
 			time.setHours(10);
 			time.setMinutes(00);
@@ -140,45 +199,73 @@
 				var deltaY1, deltaY2, deltaY3, deltaY4, deltaY5;
 				for (var i = 0; i < count; i++) {
 					time.setTime(time.getTime() + updateInterval);
-
-					deltaY1 = -1 + Math.random() * (1 + 1);
-					deltaY2 = -1 + Math.random() * (1 + 1);
-					deltaY3 = -1 + Math.random() * (1 + 1);
-					deltaY4 = -1 + Math.random() * (1 + 1);
-					deltaY5 = -1 + Math.random() * (1 + 1);
+					if (h[0] != undefined) {
+						deltaY1 = -1 + Math.random() * (1 + 1);
+					}
+					if (h[1] != undefined) {
+						deltaY2 = -1 + Math.random() * (1 + 1);
+					}
+					if (h[2] != undefined) {
+						deltaY3 = -1 + Math.random() * (1 + 1);
+					}
+					if (h[3] != undefined) {
+						deltaY4 = -1 + Math.random() * (1 + 1);
+					}
+					if (h[4] != undefined) {
+						deltaY5 = -1 + Math.random() * (1 + 1);
+					}
 
 
 					bringData();
 
 					// pushing the new values
-					dataPoints1.push({
-						x: time.getTime(),
-						y: yValue1
-					});
-					dataPoints2.push({
-						x: time.getTime(),
-						y: yValue2
-					});
-					dataPoints3.push({
-						x: time.getTime(),
-						y: yValue3
-					});
-					dataPoints4.push({
-						x: time.getTime(),
-						y: yValue4
-					});
-					dataPoints5.push({
-						x: time.getTime(),
-						y: yValue5
-					});
+					if (h[0] != undefined) {
+						dataPoints1.push({
+							x: time.getTime(),
+							y: yValue1
+						});
+					}
+					if (h[1] != undefined) {
+						dataPoints2.push({
+							x: time.getTime(),
+							y: yValue2
+						});
+					}
+					if (h[2] != undefined) {
+						dataPoints3.push({
+							x: time.getTime(),
+							y: yValue3
+						});
+					}
+					if (h[3] != undefined) {
+						dataPoints4.push({
+							x: time.getTime(),
+							y: yValue4
+						});
+					}
+					if (h[4] != undefined) {
+						dataPoints5.push({
+							x: time.getTime(),
+							y: yValue5
+						});
+					}
 				}
 
+
 				// updating legend text with  updated with y Value 
+				if(h[0]!=undefined){
 				options.data[0].legendText = h[0] + " : " + yValue1 + "$";
+				}if(h[1]!=undefined){
 				options.data[1].legendText = h[1] + " : " + yValue2 + "$";
+				}if(h[2]!=undefined){
 				options.data[2].legendText = h[2] + " : " + yValue3 + "$";
+				}if(h[3]!=undefined){
 				options.data[3].legendText = h[3] + " : " + yValue4 + "$";
+				}if(h[4]!=undefined){
 				options.data[4].legendText = h[4] + " : " + yValue5 + "$";
+				}
+
+
 				$("#chartContainer").CanvasJSChart().render();
 			}
 			// generates first set of dataPoints 
@@ -187,13 +274,13 @@
 
 		}
 	</script>
-</head>
+	</head>
 
-<body>
-	<div id="chartContainer" style="height: 370px; width: 100%;"></div>
-	<script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
-	<script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+	<body>
+		<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+		<script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+		<script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
 
-</body>
+	</body>
 
 </html>

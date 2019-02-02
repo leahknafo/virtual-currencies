@@ -81,7 +81,29 @@ const modalTemplate = `
 </div>
   
   `
+const spinnerTemplate=`
+<div class="spinner-border text-primary" role="status">
+<span class="sr-only">Loading...</span>
+</div>`
 
+$('.myProgress').css('visibility', 'hidden')
+
+function move() {
+  var elem = document.getElementById("myBar");   
+  var width = 10;
+  var id = setInterval(frame, 10);
+  function frame() {
+    if (width >= 100) {
+      clearInterval(id);
+      $('.myProgress').css('visibility', 'hidden')
+    } else {
+      $('.myProgress').css('visibility', 'visible')
+      width++; 
+      elem.style.width = width + '%'; 
+      elem.innerHTML = width * 1  + '%';
+    }
+  }
+}
 
 //With page loading, information about the coins coming from API will be displayed.
 $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
@@ -101,7 +123,7 @@ $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
 //By clicking the button, additional information about the currency will be opened
 function collapseEvent() {
   $('.collapse').on('show.bs.collapse', function () {
-
+    move();
     $.ajax('https://api.coingecko.com/api/v3/coins/' + this.id).done((d) => {
       console.log(d);
       let t = collapseTemplate;
@@ -112,7 +134,9 @@ function collapseEvent() {
       $('#' + this.id).html(t);
 
     });
+   
   })
+
 }
 
 
@@ -136,6 +160,7 @@ function searchBySymbol() {
   })
 }
 
+//
 function buildBySearch() {
   $.ajax('https://api.coingecko.com/api/v3/coins/' + search).done(function (d) {
     console.log(d);
