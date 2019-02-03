@@ -4,7 +4,7 @@ const currenciesTemplate = `<div class="card col-4" style="width: 18rem;">
     <div class="card-body">
     <div class="row">
       <h5 class="card-title col-6">{{symbol}}</h5>
-      <div class="custom-control custom-switch col-6">
+      <div class="custom-control custom-switch col-6";>
       &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <input type="checkbox" class="custom-control-input" id="my{{id}}" onchange = toggleChanges()>
       <label class="custom-control-label" for="my{{id}}"></label>
@@ -12,7 +12,7 @@ const currenciesTemplate = `<div class="card col-4" style="width: 18rem;">
     </div>
       <ul class="list-group list-group-flush">
       <li class="list-group-item">{{name}}</li>
-      <a class="btn btn-primary" data-toggle="collapse" href="#{{id}}" role="button" aria-expanded="false" aria-controls="{{id}}")>
+      <a class="btn btn-dark" data-toggle="collapse" href="#{{id}}" role="button" aria-expanded="false" aria-controls="{{id}}")>
       More Info
     </a>
     <div class="collapse" id="{{id}}">
@@ -22,12 +22,14 @@ const currenciesTemplate = `<div class="card col-4" style="width: 18rem;">
   <br>`
 
 //Template for additional information
-const collapseTemplate = `<img src="{{image}}">
+const collapseTemplate = `
+  <div class="card" style="width: 18rem;">
   <ul class="list-group list-group-flush">
-  <li class="list-group-item">{{USD}}&nbsp$</li>
-  <li class="list-group-item">{{EUR}}&nbsp₪</li>
-  <li class="list-group-item">{{ILS}}&nbsp€</li>
-  </ul>`;
+  <li class="list-group-item"><img src="{{image}}"></li>
+    <li class="list-group-item">{{USD}}&nbsp$</li>
+    <li class="list-group-item">{{EUR}}&nbsp₪</li>
+    <li class="list-group-item">{{ILS}}&nbsp€</li>
+  </ul>`
 
 
 //Template for the modal
@@ -71,7 +73,7 @@ const modalTemplate = `
         </div>
         <!-- Modal footer -->
         <div class="modal-footer">
-          <button type="button" id="savebutton" class="btn btn-danger" data-dismiss="modal">Save</button>
+          <button type="button" id="savebutton" class="btn btn-dark" data-dismiss="modal">Save</button>
         </div>
         
       </div>
@@ -142,6 +144,7 @@ $("#searchbutton").click(function () {
 
 //The function runs on the currency list and finds where the symbol is equal to the information received in the input
 var search;
+var input=$("#searchinput").val();
 function searchBySymbol() {
   $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
     for (let i = 100; i < 200; i++) {
@@ -164,10 +167,25 @@ function buildBySearch() {
     t = t.replace(/{{id}}/g, d.id);
     $('#content').html(t);
   });
-  collapseEvent();
+  CollapseEvent();
 
 }
 
+function searchCollapseEvent() {
+  $('.collapse').on('show.bs.collapse', function () {
+    $.ajax('https://api.coingecko.com/api/v3/coins/' + 'airbloc-protocol').done( function (d) {
+      move()
+      console.log(d);
+      let t = collapseTemplate;
+      t = t.replace('{{image}}', d.image.thumb);
+      t = t.replace('{{USD}}', d.market_data.current_price.usd);
+      t = t.replace('{{EUR}}', d.market_data.current_price.eur);
+      t = t.replace('{{ILS}}', d.market_data.current_price.ils);
+      $('#' + 'airbloc-protocol').html(t);
+
+    });
+  })
+}
 
 //This array contains all the "id" of the currencies
 var idArray = [];

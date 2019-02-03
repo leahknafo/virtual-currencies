@@ -16,40 +16,43 @@
 <body>
 	<header>
 		<div class="container">
-			<nav class="navbar navbar-expand-lg navbar navbar-dark bg-dark">
-				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01"
-				 aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
-					<span class="navbar-toggler-icon"></span>
-				</button>
-				<div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-					<a class="navbar-brand" href="#">Virtual currencies</a>
-					<ul class="navbar-nav mr-auto mt-2 mt-lg-0" id='mainNav'>
-						<li class="nav-item">
-							<a id="home" class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
-						</li>
-						<li class="nav-item active">
-							<a id="reports" class="nav-link" href="reports.html">Reports</a>
-						</li>
-						<li class="nav-item">
-							<a id="about" class="nav-link" href="about.html">About</a>
-						</li>
-					</ul>
-					<form class="form-inline my-2 my-lg-0">
-						<input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="searchinput">
-						<button class="btn btn-outline-success my-2 my-sm-0" type="button" id="searchbutton">Search</button>
-					</form>
+			<div class="container">
+				<div style="height:150px; background-color: rgb(15, 14, 14);">
+					<div class="d-flex justify-content-end"><img src="img/images.jpg" alt=""></div>
 				</div>
-			</nav>
-		</div>
-		<br>
-		<div class="myProgress">
-			<div id="myBar">10%</div>
-		</div>
-		<br><br>
+				<nav class="navbar navbar-expand-lg navbar navbar-dark bg-dark">
+					<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01"
+					 aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					<div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+						<a class="navbar-brand" href="#">Virtual currencies</a>
+						<ul class="navbar-nav mr-auto mt-2 mt-lg-0" id='mainNav'>
+							<li class="nav-item">
+								<a id="home" class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+							</li>
+							<li class="nav-item active">
+								<a id="reports" class="nav-link" href="reports.html">Reports</a>
+							</li>
+							<li class="nav-item">
+								<a id="about" class="nav-link" href="about.html">About</a>
+							</li>
+						</ul>
+						<form class="form-inline my-2 my-lg-0">
+							<input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="searchinput">
+							<button class="btn btn-outline-success my-2 my-sm-0" type="button" id="searchbutton">Search</button>
+						</form>
+					</div>
+				</nav>
+			</div>
+			<br>
+			<div class="myProgress">
+				<div id="myBar">10%</div>
+			</div>
+			<br><br>
 	</header>
 
 	<script src="node_modules/jquery/dist/jquery.min.js"></script>
-	<!-- <script src="home.js"></script> -->
 	<script>
 
 		var reports = [];
@@ -59,10 +62,10 @@
 		//Get the currency report from local storage:
 		if ((localStorage.getItem("report") != null)) {
 			reports = getReportsFromLocalStorage();
-        }
-			h = reports;
-	
-///The function that activates the progress bar
+		}
+		h = reports;
+
+		///The function that activates the progress bar
 		function move() {
 			var elem = document.getElementById("myBar");
 			var width = 10;
@@ -194,19 +197,19 @@
 				// console.log(data)
 				// data.length = 0;
 				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[0]).done(function (d) {
-					yValue1=d.market_data.current_price.usd;
+					yValue1 = d.market_data.current_price.usd;
 				})
 				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[1]).done(function (d) {
-					yValue2=d.market_data.current_price.usd;
+					yValue2 = d.market_data.current_price.usd;
 				})
 				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[2]).done(function (d) {
-					yValue3=d.market_data.current_price.usd;
+					yValue3 = d.market_data.current_price.usd;
 				})
 				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[3]).done(function (d) {
-					yValue4=d.market_data.current_price.usd;
+					yValue4 = d.market_data.current_price.usd;
 				})
 				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[4]).done(function (d) {
-					yValue5=d.market_data.current_price.usd;
+					yValue5 = d.market_data.current_price.usd;
 				})
 			}
 

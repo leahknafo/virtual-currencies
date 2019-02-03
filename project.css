@@ -6,11 +6,23 @@
   #myBar {
     width: 10%;
     height: 30px;
-    background-color: blue;
+    background-color: rgb(22, 22, 10);
     text-align: center;
     line-height: 30px;
     color: white;
   }
-  img {
-    border-radius: 40%;
-  }
+.title{
+  color: #28a745
+}
+
+.maintitle {
+height:150px;
+background-color: rgb(15, 14, 14);
+}
+.custom-switch .custom-control-input:checked ~ .custom-control-label::before{
+  background-color: black;
+  box-shadow: black;
+}
+.hg{
+  color: rgb(56, 56, 8);
+}
