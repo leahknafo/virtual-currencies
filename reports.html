@@ -43,32 +43,47 @@
 		</div>
 		<br>
 		<div class="myProgress">
-				<div id="myBar">10%</div>
-			  </div>
+			<div id="myBar">10%</div>
+		</div>
 		<br><br>
 	</header>
 
 	<script src="node_modules/jquery/dist/jquery.min.js"></script>
-	<script src="home.js"></script>
+	<!-- <script src="home.js"></script> -->
 	<script>
-	
+
 		var reports = [];
 		var symbolsArray = [];
 		var h;
 
-//Get the currency report from local storage:
-if ((localStorage.getItem("report") != null)) {
-				reports = getReportsFromLocalStorage();
-				console.log(reports)
-				h = reports;
+		//Get the currency report from local storage:
+		if ((localStorage.getItem("report") != null)) {
+			reports = getReportsFromLocalStorage();
+        }
+			h = reports;
+	
+///The function that activates the progress bar
+		function move() {
+			var elem = document.getElementById("myBar");
+			var width = 10;
+			var id = setInterval(frame, 10);
+			function frame() {
+				if (width >= 100) {
+					clearInterval(id);
+					$('.myProgress').css('visibility', 'hidden')
+				} else {
+					$('.myProgress').css('visibility', 'visible')
+					width++;
+					elem.style.width = width + '%';
+					elem.innerHTML = width * 1 + '%';
+				}
 			}
-			
-// function sleep(ms) {
-//   return new Promise(resolve => setTimeout(resolve, ms));
-// } 
-// async function demo() {
-//   await sleep(400);
-// }
+		}
+
+		function getReportsFromLocalStorage() {
+			let getMe = localStorage.getItem("report");
+			return JSON.parse(getMe);
+		}
 
 		window.onload = function () {
 			move()
@@ -158,36 +173,45 @@ if ((localStorage.getItem("report") != null)) {
 			var yValue3;
 			var yValue4;
 			var yValue5;
-			var data=[];
+			var data = [];
 
 
 
 
 			function bringData() {
-				for (let i = 0; i <= h.length; i++) {
+				// for (let i = 0; i <= h.length; i++) {
 
-					$.ajax('https://api.coingecko.com/api/v3/coins/' + h[i]).done(function (d) {
-						data.push(d.market_data.current_price.usd)
-					})
-					// demo()
-					
-				}
-				yValue1 = data[0];
-				yValue2 = data[1];
-				yValue3 = data[2];
-				yValue4 = data[3];
-				yValue5 = data[4];
-				console.log(data)
-                data.length=0;
-				
+				// 	$.ajax('https://api.coingecko.com/api/v3/coins/' + h[i]).done(function (d) {
+				// 		// data.push(d.market_data.current_price.usd)
+				// 	})
+
+				// }
+				// yValue1 = data[0];
+				// yValue2 = data[1];
+				// yValue3 = data[2];
+				// yValue4 = data[3];
+				// yValue5 = data[4];
+				// console.log(data)
+				// data.length = 0;
+				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[0]).done(function (d) {
+					yValue1=d.market_data.current_price.usd;
+				})
+				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[1]).done(function (d) {
+					yValue2=d.market_data.current_price.usd;
+				})
+				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[2]).done(function (d) {
+					yValue3=d.market_data.current_price.usd;
+				})
+				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[3]).done(function (d) {
+					yValue4=d.market_data.current_price.usd;
+				})
+				$.ajax('https://api.coingecko.com/api/v3/coins/' + h[4]).done(function (d) {
+					yValue5=d.market_data.current_price.usd;
+				})
 			}
-			//initial value
-		bringData()
-
-			
 
 			var time = new Date;
-			
+
 			// starting at 10.00 am
 			time.setHours(10);
 			time.setMinutes(00);
@@ -253,16 +277,16 @@ if ((localStorage.getItem("report") != null)) {
 
 
 				// updating legend text with  updated with y Value 
-				if(h[0]!=undefined){
-				options.data[0].legendText = h[0] + " : " + yValue1 + "$";
-				}if(h[1]!=undefined){
-				options.data[1].legendText = h[1] + " : " + yValue2 + "$";
-				}if(h[2]!=undefined){
-				options.data[2].legendText = h[2] + " : " + yValue3 + "$";
-				}if(h[3]!=undefined){
-				options.data[3].legendText = h[3] + " : " + yValue4 + "$";
-				}if(h[4]!=undefined){
-				options.data[4].legendText = h[4] + " : " + yValue5 + "$";
+				if (h[0] != undefined) {
+					options.data[0].legendText = h[0] + " : " + yValue1 + "$";
+				} if (h[1] != undefined) {
+					options.data[1].legendText = h[1] + " : " + yValue2 + "$";
+				} if (h[2] != undefined) {
+					options.data[2].legendText = h[2] + " : " + yValue3 + "$";
+				} if (h[3] != undefined) {
+					options.data[3].legendText = h[3] + " : " + yValue4 + "$";
+				} if (h[4] != undefined) {
+					options.data[4].legendText = h[4] + " : " + yValue5 + "$";
 				}
 
 

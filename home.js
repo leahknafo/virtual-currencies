@@ -81,31 +81,9 @@ const modalTemplate = `
 </div>
   
   `
-const spinnerTemplate=`
-<div class="spinner-border text-primary" role="status">
-<span class="sr-only">Loading...</span>
-</div>`
-
-$('.myProgress').css('visibility', 'hidden')
-
-function move() {
-  var elem = document.getElementById("myBar");   
-  var width = 10;
-  var id = setInterval(frame, 10);
-  function frame() {
-    if (width >= 100) {
-      clearInterval(id);
-      $('.myProgress').css('visibility', 'hidden')
-    } else {
-      $('.myProgress').css('visibility', 'visible')
-      width++; 
-      elem.style.width = width + '%'; 
-      elem.innerHTML = width * 1  + '%';
-    }
-  }
-}
 
 //With page loading, information about the coins coming from API will be displayed.
+move()
 $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
   console.log(d);
   for (i = 100; i < 200; i++) {
@@ -123,8 +101,8 @@ $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
 //By clicking the button, additional information about the currency will be opened
 function collapseEvent() {
   $('.collapse').on('show.bs.collapse', function () {
-    move();
     $.ajax('https://api.coingecko.com/api/v3/coins/' + this.id).done((d) => {
+      move()
       console.log(d);
       let t = collapseTemplate;
       t = t.replace('{{image}}', d.image.thumb);
@@ -134,19 +112,35 @@ function collapseEvent() {
       $('#' + this.id).html(t);
 
     });
-   
   })
-
 }
 
+//The function that activates the progress bar
+function move() {
+  var elem = document.getElementById("myBar");
+  var width = 10;
+  var id = setInterval(frame, 5);
+  function frame() {
+    if (width >= 100) {
+      clearInterval(id);
+      $('.myProgress').css('visibility', 'hidden')
+    } else {
+      $('.myProgress').css('visibility', 'visible')
+      width++;
+      elem.style.width = width + '%';
+      elem.innerHTML = width * 1 + '%';
+    }
+  }
+}
 
-
-
+//When the Search button is pressed, the display will be empty and the search function will be activated
 $("#searchbutton").click(function () {
   $('#content').empty();
   searchBySymbol()
 })
 
+
+//The function runs on the currency list and finds where the symbol is equal to the information received in the input
 var search;
 function searchBySymbol() {
   $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
@@ -160,7 +154,7 @@ function searchBySymbol() {
   })
 }
 
-//
+//The function builds the relevant card display
 function buildBySearch() {
   $.ajax('https://api.coingecko.com/api/v3/coins/' + search).done(function (d) {
     console.log(d);
@@ -169,8 +163,6 @@ function buildBySearch() {
     t = t.replace('{{name}}', d.name);
     t = t.replace(/{{id}}/g, d.id);
     $('#content').html(t);
-
-
   });
   collapseEvent();
 
@@ -187,19 +179,19 @@ $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
 
 
 //If the user wants to add a sixth currency to the list of reports, the function that deals with the modal will be called
-var currenciesReport=[];
+var currenciesReport = [];
 var tempArray;
 var theSixth;
 
 function toggleChanges() {
   let counter = 0;
-  tempArray=[]
+  tempArray = []
   for (let i = 0; i < idArray.length; i++) {
     if ($("#my" + idArray[i]).prop("checked") == true) {
       counter++
       tempArray.push(idArray[i]);
-      }
     }
+  }
   if (counter <= 5) {
     currenciesReport = tempArray;
     setReportsToLocalStorage(currenciesReport);
@@ -243,19 +235,26 @@ function appendModalTemplate() {
 
 //The function checks whether a currency has been removed from the list. And if this is the case, the sixth coin marked on the spot will be inserted
 function modalToggleChange() {
-  for (let i = 0; i < currenciesReport.length; i++) {
-    if ($("#modal" + currenciesReport[i]).prop("checked") == false) { var removeItem = currenciesReport[i];
       $("#savebutton").click(function () {
+        for (let i = 0; i < currenciesReport.length; i++) {
+          if ($("#modal" + currenciesReport[i]).prop("checked") == false) {
+            var removeItem = currenciesReport[i];
         $("#my" + currenciesReport[i]).prop("checked", false);
         $("#my" + theSixth).prop("checked", true);
         currenciesReport = jQuery.grep(currenciesReport, function (value) {
-          return value != removeItem;
+          return value != removeItem; 
         });
         currenciesReport.push(theSixth);
-        setReportsToLocalStorage(currenciesReport);
-      })
+        console.log(currenciesReport)
+      }
+  }
+  for(let i=currenciesReport.length; i>0; i--){
+    if(currenciesReport[i]==currenciesReport[i-1]){
+currenciesReport.pop(currenciesReport[i]);
+  setReportsToLocalStorage(currenciesReport);
     }
   }
+})
 }
 
 
@@ -285,17 +284,18 @@ function cancelSwitching() {
       $("#my" + theSixth).prop("checked", false);
     }
   })
-
+  setReportsToLocalStorage(currenciesReport);
 }
 
 var reports = [];
 
+//The function stores localstorage in the updated list of reports and overwrites the previous one
 function setReportsToLocalStorage(currenciesReport) {
   report = JSON.stringify(currenciesReport);
   localStorage.setItem("report", report);
 }
 
-function getReportsFromLocalStorage() {
-  let getMe = localStorage.getItem("report");
-return JSON.parse(getMe);
-} 
+
+
+
+

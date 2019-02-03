@@ -1,4 +1,4 @@
-#myProgress {
+.myProgress {
     width: 100%;
     background-color: #ddd;
   }
@@ -10,4 +10,7 @@
     text-align: center;
     line-height: 30px;
     color: white;
+  }
+  img {
+    border-radius: 40%;
   }
