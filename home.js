@@ -83,6 +83,27 @@ const modalTemplate = `
 </div>
   
   `
+  //The template for the search
+const searchTemplate = `<div class="card col-4" style="width: 18rem;">
+<div class="card-body">
+<div class="row">
+  <h5 class="card-title col-6">{{symbol}}</h5>
+  <div class="custom-control custom-switch col-6";>
+  &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <input type="checkbox" class="custom-control-input" id="search{{id}}" onchange = searchChanges()>
+  <label class="custom-control-label" for="search{{id}}"></label>
+  </div>
+</div>
+  <ul class="list-group list-group-flush">
+  <li class="list-group-item">{{name}}</li>
+  <a class="btn btn-dark" data-toggle="collapse" href="#search{{id}}" role="button" aria-expanded="false" aria-controls="search{{id}}">
+  More Info
+</a>
+<div class="collapse" id="search{{id}}">
+</div>
+</ul>
+</div>
+<br>`
 
 //With page loading, information about the coins coming from API will be displayed.
 move()
@@ -116,6 +137,25 @@ function collapseEvent() {
     });
   })
 }
+// var search;
+// function searchCollapseEvent() {
+//   $('.collapse').on('show.bs.collapse', function () {
+//     console.log(search)
+//     $.ajax('https://api.coingecko.com/api/v3/coins/' + search).done( function (d) {
+//       // move()
+//       console.log(d);
+//       console.log(search)
+//       let t = collapseTemplate;
+//       t = t.replace('{{image}}', d.image.thumb);
+//       t = t.replace('{{USD}}', d.market_data.current_price.usd);
+//       t = t.replace('{{EUR}}', d.market_data.current_price.eur);
+//       t = t.replace('{{ILS}}', d.market_data.current_price.ils);
+//       console.log(search);
+//       $('#search' + search).html(t);
+
+//     });
+//   })
+// }
 
 //The function that activates the progress bar
 function move() {
@@ -153,39 +193,24 @@ function searchBySymbol() {
       }
     }
     buildBySearch();
-
   })
 }
 
 //The function builds the relevant card display
 function buildBySearch() {
+  move()
   $.ajax('https://api.coingecko.com/api/v3/coins/' + search).done(function (d) {
     console.log(d);
-    let t = currenciesTemplate;
+    let t = searchTemplate;
     t = t.replace('{{symbol}}', d.symbol);
     t = t.replace('{{name}}', d.name);
     t = t.replace(/{{id}}/g, d.id);
     $('#content').html(t);
   });
-  CollapseEvent();
-
+  collapseEvent();
 }
 
-function searchCollapseEvent() {
-  $('.collapse').on('show.bs.collapse', function () {
-    $.ajax('https://api.coingecko.com/api/v3/coins/' + 'airbloc-protocol').done( function (d) {
-      move()
-      console.log(d);
-      let t = collapseTemplate;
-      t = t.replace('{{image}}', d.image.thumb);
-      t = t.replace('{{USD}}', d.market_data.current_price.usd);
-      t = t.replace('{{EUR}}', d.market_data.current_price.eur);
-      t = t.replace('{{ILS}}', d.market_data.current_price.ils);
-      $('#' + 'airbloc-protocol').html(t);
 
-    });
-  })
-}
 
 //This array contains all the "id" of the currencies
 var idArray = [];
@@ -200,7 +225,6 @@ $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
 var currenciesReport = [];
 var tempArray;
 var theSixth;
-
 function toggleChanges() {
   let counter = 0;
   tempArray = []
@@ -217,6 +241,21 @@ function toggleChanges() {
   if (counter > 5) {
     findTheSixth();
     appendModalTemplate();
+  }
+}
+
+//This function is responsible for changes in the toggle button of the search result card
+var sixth;
+function searchChanges(){
+  reports = getReportsFromLocalStorage()
+  console.log(reports);
+  if(reports.length==5){
+    sixth=search;
+    appendModalTemplate();
+  }
+  else{
+    currenciesReport.push(search);
+    setReportsToLocalStorage(currenciesReport)
   }
 }
 
@@ -262,7 +301,12 @@ function modalToggleChange() {
         currenciesReport = jQuery.grep(currenciesReport, function (value) {
           return value != removeItem; 
         });
+        if(theSixth!=undefined){
         currenciesReport.push(theSixth);
+        }
+        else{
+        currenciesReport.push(sixth);
+        }
         console.log(currenciesReport)
       }
   }
@@ -311,6 +355,12 @@ var reports = [];
 function setReportsToLocalStorage(currenciesReport) {
   report = JSON.stringify(currenciesReport);
   localStorage.setItem("report", report);
+}
+
+//This function gets data from local storage
+function getReportsFromLocalStorage() {
+  let getMe = localStorage.getItem("report");
+  return JSON.parse(getMe);
 }
 
 
