@@ -247,7 +247,9 @@ function toggleChanges() {
 //This function is responsible for changes in the toggle button of the search result card
 var sixth;
 function searchChanges(){
-  reports = getReportsFromLocalStorage()
+  if ((localStorage.getItem("report") != null)) {
+    reports = getReportsFromLocalStorage();
+  }
   console.log(reports);
   if(reports.length==5){
     sixth=search;
