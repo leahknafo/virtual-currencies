@@ -15,7 +15,7 @@ const currenciesTemplate = `<div class="card col-4" style="width: 18rem;">
       <a class="btn btn-dark" data-toggle="collapse" href="#{{id}}" role="button" aria-expanded="false" aria-controls="{{id}}")>
       More Info
     </a>
-    <div class="collapse" id="{{id}}">
+    <div class="collapse coin" id="{{id}}">
     </div>
     </ul>
   </div>
@@ -96,16 +96,17 @@ const searchTemplate = `<div class="card col-4" style="width: 18rem;">
 </div>
   <ul class="list-group list-group-flush">
   <li class="list-group-item">{{name}}</li>
-  <a class="btn btn-dark" data-toggle="collapse" href="#search{{id}}" role="button" aria-expanded="false" aria-controls="search{{id}}">
+  <a class="btn btn-dark" data-toggle="collapse" href="#input{{id}}" role="button" aria-expanded="false" aria-controls="input{{id}}">
   More Info
 </a>
-<div class="collapse" id="search{{id}}">
+<div class="collapse coin" id="input{{id}}">
 </div>
 </ul>
 </div>
 <br>`
 
 //With page loading, information about the coins coming from API will be displayed.
+var generalReports;
 move()
 $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
   console.log(d);
@@ -115,16 +116,24 @@ $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
     t = t.replace('{{name}}', d[i].name);
     t = t.replace(/{{id}}/g, d[i].id);
     $('#content').append(t);
-
+    if ((localStorage.getItem("report") != null)) {
+      generalReports = getReportsFromLocalStorage();
+      console.log(generalReports)
+      for(let j=0; j<generalReports.length; j++){
+        if(d[i].id==generalReports[j]){
+          $("#my"+d[i].id).prop("checked", true)
+        }
+    }
   }
-  collapseEvent();
+}
 });
+
 
 
 //By clicking the button, additional information about the currency will be opened
 function collapseEvent() {
-  $('.collapse').on('show.bs.collapse', function () {
-    $.ajax('https://api.coingecko.com/api/v3/coins/' + this.id).done((d) => {
+  $(document).on('show.bs.collapse', '.collapse.coin', function () {
+    $.ajax('https://api.coingecko.com/api/v3/coins/' + this.id.replace('input', '')).done((d) => {
       move()
       console.log(d);
       let t = collapseTemplate;
@@ -250,7 +259,6 @@ function searchChanges(){
   if ((localStorage.getItem("report") != null)) {
     reports = getReportsFromLocalStorage();
   }
-  console.log(reports);
   if(reports.length==5){
     sixth=search;
     appendModalTemplate();
@@ -281,7 +289,12 @@ function findTheSixth() {
 //The values ​​in the modal change accordingly and the modal is displayed
 function appendModalTemplate() {
   let t = modalTemplate;
-  let r = currenciesReport;
+  // if(currenciesReport[0]!=undefined){
+  r = currenciesReport;
+  // }
+  // else{
+  // r=getReportsFromLocalStorage();
+  // }
   t = t.replace(/{{first}}/g, r[0]);
   t = t.replace(/{{second}}/g, r[1]);
   t = t.replace(/{{third}}/g, r[2]);
@@ -309,15 +322,14 @@ function modalToggleChange() {
         else{
         currenciesReport.push(sixth);
         }
-        console.log(currenciesReport)
       }
   }
   for(let i=currenciesReport.length; i>0; i--){
     if(currenciesReport[i]==currenciesReport[i-1]){
 currenciesReport.pop(currenciesReport[i]);
-  setReportsToLocalStorage(currenciesReport);
     }
   }
+  setReportsToLocalStorage(currenciesReport);
 })
 }
 
@@ -364,6 +376,10 @@ function getReportsFromLocalStorage() {
   let getMe = localStorage.getItem("report");
   return JSON.parse(getMe);
 }
+
+jQuery(document).ready(() => {
+  collapseEvent();
+});
 
 
 
