@@ -276,7 +276,7 @@ function toggleChanges() {
       tempArray.push(idArray[i]);
     }
   }
-  //In any case where the number of coins is less than or equal to five, the coins will be kept in currenciesReport and localStorage
+  //In any case when the number of coins is less than or equal to five, the coins will be kept in currenciesReport and localStorage
   if (counter <= 5) {
     currenciesReport = tempArray;
     setReportsToLocalStorage(currenciesReport);
@@ -350,8 +350,6 @@ function modalToggleChange() {
     setReportsToLocalStorage(currenciesReport);
   })
 }
-
-
 
 
 //By pressing the Cancel button or the Save button without changing. The sixth currency will not be placed in the list of reports
