@@ -83,7 +83,7 @@ const modalTemplate = `
 </div>
   
   `
-  //The template for the search
+//The template for the search
 const searchTemplate = `<div class="card col-4" style="width: 18rem;">
 <div class="card-body">
 <div class="row">
@@ -119,13 +119,13 @@ $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
     if ((localStorage.getItem("report") != null)) {
       generalReports = getReportsFromLocalStorage();
       console.log(generalReports)
-      for(let j=0; j<generalReports.length; j++){
-        if(d[i].id==generalReports[j]){
-          $("#my"+d[i].id).prop("checked", true)
+      for (let j = 0; j < generalReports.length; j++) {
+        if (d[i].id == generalReports[j]) {
+          $("#my" + d[i].id).prop("checked", true)
         }
+      }
     }
   }
-}
 });
 
 
@@ -146,25 +146,7 @@ function collapseEvent() {
     });
   })
 }
-// var search;
-// function searchCollapseEvent() {
-//   $('.collapse').on('show.bs.collapse', function () {
-//     console.log(search)
-//     $.ajax('https://api.coingecko.com/api/v3/coins/' + search).done( function (d) {
-//       // move()
-//       console.log(d);
-//       console.log(search)
-//       let t = collapseTemplate;
-//       t = t.replace('{{image}}', d.image.thumb);
-//       t = t.replace('{{USD}}', d.market_data.current_price.usd);
-//       t = t.replace('{{EUR}}', d.market_data.current_price.eur);
-//       t = t.replace('{{ILS}}', d.market_data.current_price.ils);
-//       console.log(search);
-//       $('#search' + search).html(t);
 
-//     });
-//   })
-// }
 
 //The function that activates the progress bar
 function move() {
@@ -193,7 +175,7 @@ $("#searchbutton").click(function () {
 
 //The function runs on the currency list and finds where the symbol is equal to the information received in the input
 var search;
-var input=$("#searchinput").val();
+var input = $("#searchinput").val();
 function searchBySymbol() {
   $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
     for (let i = 100; i < 200; i++) {
@@ -248,6 +230,11 @@ function toggleChanges() {
     setReportsToLocalStorage(currenciesReport);
   }
   if (counter > 5) {
+    if (currenciesReport.length == 0) {
+      currenciesReport = getReportsFromLocalStorage()
+    }
+    console.log(tempArray)
+    console.log(currenciesReport)
     findTheSixth();
     appendModalTemplate();
   }
@@ -255,15 +242,15 @@ function toggleChanges() {
 
 //This function is responsible for changes in the toggle button of the search result card
 var sixth;
-function searchChanges(){
+function searchChanges() {
   if ((localStorage.getItem("report") != null)) {
-    reports = getReportsFromLocalStorage();
+    currenciesReport = getReportsFromLocalStorage();
   }
-  if(reports.length==5){
-    sixth=search;
+  if (currenciesReport.length == 5) {
+    sixth = search;
     appendModalTemplate();
   }
-  else{
+  else {
     currenciesReport.push(search);
     setReportsToLocalStorage(currenciesReport)
   }
@@ -289,12 +276,7 @@ function findTheSixth() {
 //The values ​​in the modal change accordingly and the modal is displayed
 function appendModalTemplate() {
   let t = modalTemplate;
-  // if(currenciesReport[0]!=undefined){
   r = currenciesReport;
-  // }
-  // else{
-  // r=getReportsFromLocalStorage();
-  // }
   t = t.replace(/{{first}}/g, r[0]);
   t = t.replace(/{{second}}/g, r[1]);
   t = t.replace(/{{third}}/g, r[2]);
@@ -307,30 +289,30 @@ function appendModalTemplate() {
 
 //The function checks whether a currency has been removed from the list. And if this is the case, the sixth coin marked on the spot will be inserted
 function modalToggleChange() {
-      $("#savebutton").click(function () {
-        for (let i = 0; i < currenciesReport.length; i++) {
-          if ($("#modal" + currenciesReport[i]).prop("checked") == false) {
-            var removeItem = currenciesReport[i];
+  $("#savebutton").click(function () {
+    for (let i = 0; i < currenciesReport.length; i++) {
+      if ($("#modal" + currenciesReport[i]).prop("checked") == false) {
+        var removeItem = currenciesReport[i];
         $("#my" + currenciesReport[i]).prop("checked", false);
         $("#my" + theSixth).prop("checked", true);
         currenciesReport = jQuery.grep(currenciesReport, function (value) {
-          return value != removeItem; 
+          return value != removeItem;
         });
-        if(theSixth!=undefined){
-        currenciesReport.push(theSixth);
+        if (theSixth != undefined) {
+          currenciesReport.push(theSixth);
         }
-        else{
-        currenciesReport.push(sixth);
+        else {
+          currenciesReport.push(sixth);
         }
       }
-  }
-  for(let i=currenciesReport.length; i>0; i--){
-    if(currenciesReport[i]==currenciesReport[i-1]){
-currenciesReport.pop(currenciesReport[i]);
     }
-  }
-  setReportsToLocalStorage(currenciesReport);
-})
+    for (let i = currenciesReport.length; i > 0; i--) {
+      if (currenciesReport[i] == currenciesReport[i - 1]) {
+        currenciesReport.pop(currenciesReport[i]);
+      }
+    }
+    setReportsToLocalStorage(currenciesReport);
+  })
 }
 
 
