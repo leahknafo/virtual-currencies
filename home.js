@@ -42,8 +42,7 @@ const modalTemplate = `
       
         <!-- Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title">
-            Attention!</h4>
+          <h4 class="modal-title">Attention!</h4>
           <button type="button" id="closebutton" class="close" data-dismiss="modal">×</button>
         </div>
         
@@ -71,15 +70,14 @@ const modalTemplate = `
             <label class="custom-control-label" for="modal{{fifth}}">{{fifth}}</label>
           </div>
         </div>
+
         <!-- Modal footer -->
         <div class="modal-footer">
           <button type="button" id="savebutton" class="btn btn-dark" data-dismiss="modal">Save</button>
-        </div>
-        
+        </div>  
       </div>
     </div>
   </div>
-  
 </div>
   
   `
@@ -105,8 +103,23 @@ const searchTemplate = `<div class="card col-4" style="width: 18rem;">
 </div>
 <br>`
 
-//With page loading, information about the coins coming from API will be displayed.
+//variables
 var generalReports;
+var search;
+var currenciesReport = [];
+var tempArray;
+var theSixth;
+var sixth;
+var reports = [];
+
+jQuery(document).ready(() => {
+  collapseEvent();
+});
+
+window.cacheObj = window.cacheObj || {};
+
+
+//With page loading, information about the coins coming from API will be displayed.
 move()
 $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
   console.log(d);
@@ -116,35 +129,78 @@ $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
     t = t.replace('{{name}}', d[i].name);
     t = t.replace(/{{id}}/g, d[i].id);
     $('#content').append(t);
-    if ((localStorage.getItem("report") != null)) {
-      generalReports = getReportsFromLocalStorage();
-      console.log(generalReports)
-      for (let j = 0; j < generalReports.length; j++) {
-        if (d[i].id == generalReports[j]) {
-          $("#my" + d[i].id).prop("checked", true)
-        }
-      }
-    }
+    checkChosenCurrencies(d)
   }
 });
 
+//The function accepts reports from localStorage and checks the relevant currencies
+function checkChosenCurrencies(d) {
+  if ((localStorage.getItem("report") != null)) {
+    generalReports = getReportsFromLocalStorage();
+    console.log(generalReports)
+    for (let j = 0; j < generalReports.length; j++) {
+      if (d[i].id == generalReports[j]) {
+        $("#my" + d[i].id).prop("checked", true)
+      }
+    }
+  }
+}
 
-
-//By clicking the button, additional information about the currency will be opened
+//By clicking the "more info" button, the "whereTakeTheDadaFrom" will be activated
 function collapseEvent() {
   $(document).on('show.bs.collapse', '.collapse.coin', function () {
-    $.ajax('https://api.coingecko.com/api/v3/coins/' + this.id.replace('input', '')).done((d) => {
-      move()
-      console.log(d);
-      let t = collapseTemplate;
-      t = t.replace('{{image}}', d.image.thumb);
-      t = t.replace('{{USD}}', d.market_data.current_price.usd);
-      t = t.replace('{{EUR}}', d.market_data.current_price.eur);
-      t = t.replace('{{ILS}}', d.market_data.current_price.ils);
-      $('#' + this.id).html(t);
-
-    });
+    whereToTakeTheDadaFrom(this.id)
   })
+}
+
+//If no more than two minutes have elapsed before the next click, the information will come from the cash
+function whereToTakeTheDadaFrom(coinId) {
+  if (window.cacheObj.projects != undefined) {
+    k = window.cacheObj.projects;
+    if (coinId == k.id) {
+      const lastTime = window.cacheObj.lastFetch;
+      if (lastTime) {
+        const dateNow = new Date();
+        const diff = (dateNow.getTime() - lastTime.getTime()) / 1000;
+        if (diff > 20) {
+          getFromServer(coinId);
+        } else {
+          getFromCache(coinId);
+        }
+      }
+    } else {
+      getFromServer(coinId);
+    }
+  }
+  else {
+    getFromServer(coinId);
+  }
+}
+
+//Sending an API call, And save time and currency data
+function getFromServer(coinId) {
+  $.ajax('https://api.coingecko.com/api/v3/coins/' + coinId.replace('input', '')).done((d) => {
+    window.cacheObj.projects = d;
+    window.cacheObj.lastFetch = new Date();
+    move()
+    moreInfo(d, coinId)
+  });
+}
+
+//Accepted data from cache
+function getFromCache(coinId) {
+  move()
+  moreInfo(window.cacheObj.projects, coinId);
+}
+
+//Display the additional information
+function moreInfo(d, coinId) {
+  let t = collapseTemplate;
+  t = t.replace('{{image}}', d.image.thumb);
+  t = t.replace('{{USD}}', d.market_data.current_price.usd);
+  t = t.replace('{{EUR}}', d.market_data.current_price.eur);
+  t = t.replace('{{ILS}}', d.market_data.current_price.ils);
+  $('#' + coinId).html(t);
 }
 
 
@@ -166,7 +222,7 @@ function move() {
   }
 }
 
-//When the Search button is pressed, the display will be empty and the search function will be activated
+//When the Search button is pressed, the display screen will be empty and the search function will be activated
 $("#searchbutton").click(function () {
   $('#content').empty();
   searchBySymbol()
@@ -174,8 +230,6 @@ $("#searchbutton").click(function () {
 
 
 //The function runs on the currency list and finds where the symbol is equal to the information received in the input
-var search;
-var input = $("#searchinput").val();
 function searchBySymbol() {
   $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
     for (let i = 100; i < 200; i++) {
@@ -187,7 +241,7 @@ function searchBySymbol() {
   })
 }
 
-//The function builds the relevant card display
+//The function builds the relevant card display using the symbol
 function buildBySearch() {
   move()
   $.ajax('https://api.coingecko.com/api/v3/coins/' + search).done(function (d) {
@@ -212,49 +266,31 @@ $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
 });
 
 
-//If the user wants to add a sixth currency to the list of reports, the function that deals with the modal will be called
-var currenciesReport = [];
-var tempArray;
-var theSixth;
 function toggleChanges() {
   let counter = 0;
   tempArray = []
+  //In any case of change in the toggle button, the loop runs on the idArray and each marked currency enters the tempArray
   for (let i = 0; i < idArray.length; i++) {
     if ($("#my" + idArray[i]).prop("checked") == true) {
       counter++
       tempArray.push(idArray[i]);
     }
   }
+  //In any case where the number of coins is less than or equal to five, the coins will be kept in currenciesReport and localStorage
   if (counter <= 5) {
     currenciesReport = tempArray;
     setReportsToLocalStorage(currenciesReport);
   }
+  //If the user wants to add a sixth currency to the list of reports, the functions that deals with the modal will be called
   if (counter > 5) {
     if (currenciesReport.length == 0) {
       currenciesReport = getReportsFromLocalStorage()
     }
-    console.log(tempArray)
-    console.log(currenciesReport)
     findTheSixth();
     appendModalTemplate();
   }
 }
 
-//This function is responsible for changes in the toggle button of the search result card
-var sixth;
-function searchChanges() {
-  if ((localStorage.getItem("report") != null)) {
-    currenciesReport = getReportsFromLocalStorage();
-  }
-  if (currenciesReport.length == 5) {
-    sixth = search;
-    appendModalTemplate();
-  }
-  else {
-    currenciesReport.push(search);
-    setReportsToLocalStorage(currenciesReport)
-  }
-}
 
 
 //After comparing the array with five coins marked and the array with 6 coins marked. We find the last currency that has been marked. 
@@ -273,7 +309,7 @@ function findTheSixth() {
 }
 
 
-//The values ​​in the modal change accordingly and the modal is displayed
+//The values ​​in the modal change accordingly, and the modal is displayed
 function appendModalTemplate() {
   let t = modalTemplate;
   r = currenciesReport;
@@ -345,7 +381,20 @@ function cancelSwitching() {
   setReportsToLocalStorage(currenciesReport);
 }
 
-var reports = [];
+//This function is responsible for changes in the toggle button of the search result card
+function searchChanges() {
+  if ((localStorage.getItem("report") != null)) {
+    currenciesReport = getReportsFromLocalStorage();
+  }
+  if (currenciesReport.length == 5) {
+    sixth = search;
+    appendModalTemplate();
+  }
+  else {
+    currenciesReport.push(search);
+    setReportsToLocalStorage(currenciesReport)
+  }
+}
 
 //The function stores localstorage in the updated list of reports and overwrites the previous one
 function setReportsToLocalStorage(currenciesReport) {
@@ -358,12 +407,5 @@ function getReportsFromLocalStorage() {
   let getMe = localStorage.getItem("report");
   return JSON.parse(getMe);
 }
-
-jQuery(document).ready(() => {
-  collapseEvent();
-});
-
-
-
 
 

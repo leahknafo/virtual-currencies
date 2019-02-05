@@ -52,20 +52,23 @@
             </div>
             <br><br>
     </header>
-
-    <script src="node_modules/jquery/dist/jquery.min.js"></script>
     <script>
 
         var reports = [];
         var symbolsArray = [];
         var h;
 
-        //Get the currency report from local storage:
+        //This function gets data from local storage
+        function getReportsFromLocalStorage() {
+            let getMe = localStorage.getItem("report");
+            return JSON.parse(getMe);
+        }
+
         if ((localStorage.getItem("report") != null)) {
             reports = getReportsFromLocalStorage();
+            h = reports;
         }
-        h = reports;
-
+        
         ///The function that activates the progress bar
         function move() {
             var elem = document.getElementById("myBar");
@@ -84,10 +87,7 @@
             }
         }
 
-        function getReportsFromLocalStorage() {
-            let getMe = localStorage.getItem("report");
-            return JSON.parse(getMe);
-        }
+      
 
         window.onload = function () {
             move()
@@ -193,12 +193,6 @@
             }
 
             var time = new Date;
-
-            // starting at 10.00 am
-            time.setHours(10);
-            time.setMinutes(00);
-            time.setSeconds(00);
-            time.setMilliseconds(00);
 
             function updateChart(count) {
                 count = count || 1;
