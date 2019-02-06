@@ -146,7 +146,7 @@ function checkChosenCurrencies(d) {
   }
 }
 
-//By clicking the "more info" button, the "whereTakeTheDadaFrom" will be activated
+//By clicking the "more info" button, the "whereToTakeTheDadaFrom" will be activated
 function collapseEvent() {
   $(document).on('show.bs.collapse', '.collapse.coin', function () {
     whereToTakeTheDadaFrom(this.id)
@@ -323,7 +323,9 @@ function appendModalTemplate() {
   cancelSwitching()
 }
 
-//The function checks whether a currency has been removed from the list. And if this is the case, the sixth coin marked on the spot will be inserted
+
+
+//The function checks whether a currency has been removed from the list. And in case like this, the sixth coin marked on the spot will be inserted
 function modalToggleChange() {
   $("#savebutton").click(function () {
     for (let i = 0; i < currenciesReport.length; i++) {
@@ -334,14 +336,17 @@ function modalToggleChange() {
         currenciesReport = jQuery.grep(currenciesReport, function (value) {
           return value != removeItem;
         });
+        //"theSixth" is the sixth currency on the main screen
         if (theSixth != undefined) {
           currenciesReport.push(theSixth);
         }
         else {
+          // "sixth" is the sixth currency from the search screen
           currenciesReport.push(sixth);
         }
       }
     }
+    //Without this loop, in case we remove some coins through the modal, the sixth coin would enter to the report several times
     for (let i = currenciesReport.length; i > 0; i--) {
       if (currenciesReport[i] == currenciesReport[i - 1]) {
         currenciesReport.pop(currenciesReport[i]);
@@ -352,7 +357,8 @@ function modalToggleChange() {
 }
 
 
-//By pressing the Cancel button or the Save button without changing. The sixth currency will not be placed in the list of reports
+
+//By pressing the Cancel button or the Save button without changing, The sixth currency will not be placed in the list of reports
 function cancelSwitching() {
   $(".close").click(function () {
     let flag = true;
@@ -379,20 +385,35 @@ function cancelSwitching() {
   setReportsToLocalStorage(currenciesReport);
 }
 
+
 //This function is responsible for changes in the toggle button of the search result card
 function searchChanges() {
+  let isTrue = false;
   if ((localStorage.getItem("report") != null)) {
     currenciesReport = getReportsFromLocalStorage();
+    //Check if the coin already exist in the reports
+    for (let i = 0; i < currenciesReport.length; i++) {
+      if (search == currenciesReport[i]) {
+        isTrue = true
+      }
+    }
   }
-  if (currenciesReport.length == 5) {
-    sixth = search;
-    appendModalTemplate();
+  if (isTrue == true) {
+    alert("This currency exist already")
   }
   else {
-    currenciesReport.push(search);
-    setReportsToLocalStorage(currenciesReport)
+    if (currenciesReport.length == 5) {
+      sixth = search;
+      appendModalTemplate();
+    }
+    else {
+      currenciesReport.push(search);
+      setReportsToLocalStorage(currenciesReport)
+
+    }
   }
 }
+
 
 //The function stores localstorage in the updated list of reports and overwrites the previous one
 function setReportsToLocalStorage(currenciesReport) {

@@ -55,8 +55,10 @@
     <script>
 
         var reports = [];
-        var symbolsArray = [];
         var h;
+        var symbolsArray = [];
+        var s;
+        
 
         //This function gets data from local storage
         function getReportsFromLocalStorage() {
@@ -87,10 +89,24 @@
             }
         }
 
-      
+        //Converts the currency report to upper case symbols instead of lower case names, for the titles 
+        $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
+				for (let i = 100; i < 200; i++) {
+					for (let j = 0; j <= reports.length; j++) {
+						if (d[i].id == reports[j]) {
+							let res = d[i].symbol.toUpperCase();
+							symbolsArray.push(res)
+						}
+					}
+				}
+                console.log(symbolsArray)
+               s = symbolsArray;
+               console.log(s)
+			});
 
         window.onload = function () {
             move()
+		
 
             var dataPoints1 = [];
             var dataPoints2 = [];
