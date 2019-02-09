@@ -88,7 +88,7 @@ const searchTemplate = `<div class="card col-4" style="width: 18rem;">
   <h5 class="card-title col-6">{{symbol}}</h5>
   <div class="custom-control custom-switch col-6";>
   &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <input type="checkbox" class="custom-control-input" id="search{{id}}" onchange = searchChanges()>
+  <input type="checkbox" class="custom-control-input" id="search{{id}}" onchange = searchToggleChanges()>
   <label class="custom-control-label" for="search{{id}}"></label>
   </div>
 </div>
@@ -111,10 +111,12 @@ var tempArray;
 var theSixth;
 var sixth;
 var reports = [];
+var done;
 
 jQuery(document).ready(() => {
   collapseEvent();
 });
+
 
 window.cacheObj = window.cacheObj || {};
 
@@ -133,11 +135,10 @@ $.ajax('https://api.coingecko.com/api/v3/coins/list').done(function (d) {
   }
 });
 
-//The function accepts reports from localStorage and checks the relevant currencies
+//The function accepts reports from localStorage and checks toggles "on" in the relevant currencies
 function checkChosenCurrencies(d) {
   if ((localStorage.getItem("report") != null)) {
     generalReports = getReportsFromLocalStorage();
-    console.log(generalReports)
     for (let j = 0; j < generalReports.length; j++) {
       if (d[i].id == generalReports[j]) {
         $("#my" + d[i].id).prop("checked", true)
@@ -251,10 +252,22 @@ function buildBySearch() {
     t = t.replace('{{name}}', d.name);
     t = t.replace(/{{id}}/g, d.id);
     $('#content').html(t);
+    doesItExistInReports();
   });
   collapseEvent();
 }
 
+//The function checks whether the currency exists in the list of reports and if so it will be checked
+function doesItExistInReports() {
+  if ((localStorage.getItem("report") != null)) {
+    currenciesReport = getReportsFromLocalStorage();
+    for (let i = 0; i < currenciesReport.length; i++) {
+      if (search == currenciesReport[i]) {
+        $("#search" + search).prop("checked", true)
+      }
+    }
+  }
+}
 
 
 //This array contains all the "id" of the currencies
@@ -386,45 +399,51 @@ function cancelSwitching() {
 }
 
 
-//This function is responsible for changes in the toggle button of the search result card
-function searchChanges() {
-  let isTrue = false;
+
+//This function is responsible for changes in the toggle button of the search currency
+function searchToggleChanges() {
+  done=0
   if ((localStorage.getItem("report") != null)) {
     currenciesReport = getReportsFromLocalStorage();
-    //Check if the coin already exist in the reports
+  }
+  if ($("#search" + search).prop("checked", true)) {
+    //If the search currency is in "currenciesReport" and the toggle has been changed, it should be removed from "currenciesReport"
     for (let i = 0; i < currenciesReport.length; i++) {
       if (search == currenciesReport[i]) {
-        isTrue = true
+        $("#search" + search).prop("checked", false)
+        var removeItem = search;
+        currenciesReport = jQuery.grep(currenciesReport, function (value) {
+          return value != removeItem;
+        });
+        setReportsToLocalStorage(currenciesReport)
+        done=1
+      }
+    }
+    //If the user wants to add the currency to "currenciesReport" and there are already 5 coins, the modal will be activated
+      if (currenciesReport.length == 5 && done!=1) {
+        sixth = search;
+        appendModalTemplate();
+      }
+      //In another case, the currency will be added to "currenciesReport"
+      else if(done!=1){
+        currenciesReport.push(search);
+        setReportsToLocalStorage(currenciesReport)
       }
     }
   }
-  if (isTrue == true) {
-    alert("This currency exist already")
+
+
+
+  //The function stores localstorage in the updated list of reports and overwrites the previous one
+  function setReportsToLocalStorage(currenciesReport) {
+    report = JSON.stringify(currenciesReport);
+    localStorage.setItem("report", report);
   }
-  else {
-    if (currenciesReport.length == 5) {
-      sixth = search;
-      appendModalTemplate();
-    }
-    else {
-      currenciesReport.push(search);
-      setReportsToLocalStorage(currenciesReport)
 
-    }
+  //This function gets data from local storage
+  function getReportsFromLocalStorage() {
+    let getMe = localStorage.getItem("report");
+    return JSON.parse(getMe);
   }
-}
-
-
-//The function stores localstorage in the updated list of reports and overwrites the previous one
-function setReportsToLocalStorage(currenciesReport) {
-  report = JSON.stringify(currenciesReport);
-  localStorage.setItem("report", report);
-}
-
-//This function gets data from local storage
-function getReportsFromLocalStorage() {
-  let getMe = localStorage.getItem("report");
-  return JSON.parse(getMe);
-}
 
 
